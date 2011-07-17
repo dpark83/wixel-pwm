@@ -1,13 +1,50 @@
+
+#ifndef _TIMER_H
+#define _TIMER_H
+
+#include <cc2511_map.h>
+#include <cc2511_types.h>
+#include <stdio.h>
+
 /******************
  * Global defines *
  ******************/
 
+#define TIMER_FALSE	1;
+#define TIMER_TRUE	0;
+ 
+/* Timer numbers */
+#define	TIMER1			1
+#define	TIMER3			3
+#define	TIMER4			4
+#define	TIMER_INVALID	255
+
+/* Channel numbers */
+#define	CHANNEL0		0
+#define	CHANNEL1		1
+#define	CHANNEL2		2
+#define CHANNEL_INVALID	255
+			 
+/* Prescaler values */
+#define	PRESCALER_1			1
+#define	PRESCALER_2			2
+#define	PRESCALER_4			4
+#define	PRESCALER_8			8
+#define	PRESCALER_16		16
+#define	PRESCALER_32		32
+#define	PRESCALER_64		64
+#define	PRESCALER_128		128
+#define	PRESCALER_INVALID	255
+ 
  /* Sets bits in a with bits from b using mask m
   * http://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge */
 #define SET_BITS(a, b, m)	(a ^ ((a ^ b) & m))
 
 /* Toggle bit n of a */
 #define TOGGLE_BIT(a, n)	(a ^ (1 << n))
+
+/* Gets bits in a using mask m */
+#define GET_BITS(a, m)		(a & m)
 
 /* Interrupt flag values */
 #define	NO_INT_PENDING	0	/* No interrupt pending */
@@ -65,8 +102,10 @@
 								All others - Capture on both edges */
 
 /* Timer x/USARTx I/O location */
-#define	ALT_1_LOC	0 /* Alternative 1 location */
-#define	ALT_2_LOC	1 /* Alternative 2 location */
+
+#define	IO_LOC_ALT_1	0	/* Alternative 1 location */
+#define	IO_LOC_ALT_2	1	/* Alternative 2 location */
+#define	IO_LOC_INVALID	255 /* Invalid location */
 
 /* Port x function select */
 #define GPIO		0 /* General purpose I/O */
@@ -141,6 +180,7 @@
 #define	T1_PRESCALER_128	0x0c	/* Tick frequency/128 (use as mask) */
 /* Set Timer 1 Prescaler divider */
 #define T1_PRESCALER_SET(v)		{T1CTL = SET_BITS(T1CTL, v, T1_PRESCALER_128); }
+#define T1_PRESCALER_GET()		(GET_BITS(T1CTL, T1_PRESCALER_128))
 
 /**********************
  * Timer 1 Mode, MODE *
@@ -319,6 +359,8 @@
 #define T1_IO_LOC_SET(v)	{PERCFG = SET_BITS(PERCFG, v << T1_IO_LOC_OFFSET, 1 << T1_IO_LOC_OFFSET);}
 /* Toggle Timer 1 I/O location */
 #define T1_IO_LOC_TOGGLE()	{PERCFG = TOGGLE_BIT(PERCFG, T1_IO_LOC_OFFSET);}
+/* Get Timer 1 I/O location */
+#define T1_IO_LOC_GET()		(GET_BITS(PERCFG, 1 << T1_IO_LOC_OFFSET) >> T1_IO_LOC_OFFSET)
 
 /*******************************
  * Timer 3 I/O location, T3CFG *
@@ -367,4 +409,49 @@
 #define P1_FUNC_SET(p, v)	{P1SEL = SET_BITS(P1SEL, v << p, 1 << p);}
 /* Toggle Port 1 Pin p function select */
 #define P1_FUNC_TOGGLE(p)	{P1SEL = TOGGLE_BIT(P1SEL, p);}
+
+/* functions */
+
+/* PreScaler functions */
+uint8 getPreScaler(uint8);
+uint8 getT1PreScaler();
+BIT setPreScaler(uint8, uint8);
+BIT setT1PreScaler(uint8);
+
+/* IO Location functions*/
+BIT setIoLocation(uint8, uint8);
+BIT setT1IoLocation(uint8);
+uint8 getIoLocation(uint8);
+uint8 getT1IoLocation();
+
+/* functions to setup channel */
+BIT setChannelMode(uint8, uint8, uint8);
+BIT setT1ChannelMode(uint8, uint8);
+BIT setChannelCompareMode(uint8, uint8, uint8);
+BIT setT1ChannelCompareMode(uint8, uint8);
+BIT setChannelFunction(uint8, uint8, uint8);
+BIT setT1ChannelFunction(uint8, uint8);
+BIT channelInit(uint8, uint8, uint8, uint8, uint8);
+
+/* functions to start/stop a timer */
+BIT setTimerMode(uint8, uint8);
+BIT timerMode(uint8, uint8);
+
+/* functions to set frequency of a timer */
+
+/* general checker functions */
+BIT checkTimer(uint8);
+BIT checkTimerMode(uint8, uint8);
+BIT checkChannel(uint8, uint8);
+BIT checkChannelMode(uint8);
+BIT checkChannelCompareMode(uint8, uint8, uint8);
+BIT checkT1ChannelCompareMode(uint8, uint8);
+BIT checkChannelFunction(uint8);
+
+/* function to initalise a timer */
+BIT timerInit(uint8, uint8, uint8);
+#endif
+
+
+
 
