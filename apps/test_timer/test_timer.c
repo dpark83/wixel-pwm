@@ -40,20 +40,18 @@ void updateLeds()
 	}
 }
 
-
 void main()
 {
 	uint8 t; /* timer */
 	uint8 c; /* channel */
+	uint32 f; /* frequency in hz */
+	
 	t = TIMER1;
 	c = CHANNEL1;
+	f = 200;
 
     systemInit();
     usbInit();
-
-	/* PWM freq */
-	T1CC0L = 0xff;
-	T1CC0H = 0x01;
 
 	/* PWM duty cycle */
 	T1CC1L = 0x40;
@@ -64,7 +62,9 @@ void main()
 	/* setup Channel 1 of Timer 1, compare mode, clear on compare up and peripheral*/
 	channelInit(t, c, COMPARE_MODE, CLR_ON_COMP_UP, PERIPHERAL);
 	/* start Timer 1 by setting it's mode to up/down */
-	timerMode(t, T1_MODE_UPDOWN);
+	timerMode(t, T1_MODE_MODULO);
+	/* set Timer 1 frequency */
+	setFrequency(TIMER1, f);
 
     while(1)
     {

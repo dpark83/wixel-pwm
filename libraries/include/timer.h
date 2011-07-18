@@ -36,6 +36,12 @@
 #define	PRESCALER_128		128
 #define	PRESCALER_INVALID	255
  
+#define	PRESCALER_1_TICK	12000000
+#define	PRESCALER_8_TICK	1500000
+#define	PRESCALER_32_TICK	375000
+#define	PRESCALER_128_TICK	93750
+
+ 
  /* Sets bits in a with bits from b using mask m
   * http://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge */
 #define SET_BITS(a, b, m)	(a ^ ((a ^ b) & m))
@@ -180,6 +186,7 @@
 #define	T1_PRESCALER_128	0x0c	/* Tick frequency/128 (use as mask) */
 /* Set Timer 1 Prescaler divider */
 #define T1_PRESCALER_SET(v)		{T1CTL = SET_BITS(T1CTL, v, T1_PRESCALER_128); }
+/* Get Timer 1 Prescaler divider */
 #define T1_PRESCALER_GET()		(GET_BITS(T1CTL, T1_PRESCALER_128))
 
 /**********************
@@ -189,8 +196,11 @@
 #define	T1_MODE_FREE		0x01	/* Free-running, repeatedly count from 0x0000 to 0xFFFF */
 #define	T1_MODE_MODULO		0x02	/* Modulo, repeatedly count from 0x0000 to T1CC0 */
 #define	T1_MODE_UPDOWN		0x03	/* Up/down, repeatedly count from 0x0000 to T1CC0 and from T1CC0 down to 0x0000 */
+#define T1_MODE_INVALID		0xff
 /* Set Timer 1 Mode */
 #define T1_MODE_SET(v)		{T1CTL = SET_BITS(T1CTL, v, T1_MODE_UPDOWN); }
+/* Get Timer 1 Mode */
+#define T1_MODE_GET()		(GET_BITS(T1CTL, T1_MODE_UPDOWN))
 
 /****************************************************************************/
 
@@ -239,7 +249,8 @@
 /*********************************************************************
  * Timer 1 Channel 0 Capture/Compare Value (T1CC0H/T1CC0L), page 118 *
  *********************************************************************/
-/* Set the DSM sample rate in DSM mode */
+/* set Timer 1 Channel 0 Capture/Compare Value */
+#define T1_CH0_CAP_VAL_SET(v)	{T1CC0H = (uint8)(v >> 8); T1CC0L = (uint8)v;}
  
 /****************************************************************************/
 
@@ -436,8 +447,15 @@ BIT channelInit(uint8, uint8, uint8, uint8, uint8);
 /* functions to start/stop a timer */
 BIT setTimerMode(uint8, uint8);
 BIT timerMode(uint8, uint8);
+uint8 getTimerMode(uint8);
+uint8 getT1TimerMode();
 
 /* functions to set frequency of a timer */
+BIT setFrequency(uint8, uint32);
+BIT setT1Frequency(uint16);
+uint16 calculateCompareValue(uint8, uint32);
+uint16 calculateT1CompareValue(uint32);
+uint16 calculateModuloValue(uint32, uint32);
 
 /* general checker functions */
 BIT checkTimer(uint8);
