@@ -1,3 +1,10 @@
+/*! \file timer.h
+ * The <code>timer.lib</code> library takes care of setting up the internal
+ * timers. This is a general purpose library but is extended by other libraries
+ * like <code>pwm.lib</code> for hardware Pulse Width Modulation.
+ *
+ * Many of the constants defined here come from the datasheet for the CC2511f32.
+ * */
 
 #ifndef _TIMER_H
 #define _TIMER_H
@@ -12,20 +19,26 @@
 
 #define TIMER_FALSE	1;
 #define TIMER_TRUE	0;
- 
-/* Timer numbers */
+
+
+/*! \name Timers
+@{*/
 #define	TIMER1			1
 #define	TIMER3			3
 #define	TIMER4			4
 #define	TIMER_INVALID	255
+/*!@} */
 
-/* Channel numbers */
+/*! \name Channels
+@{*/
 #define	CHANNEL0		0
 #define	CHANNEL1		1
 #define	CHANNEL2		2
 #define CHANNEL_INVALID	255
-			 
-/* Prescaler values */
+/*!@} */
+
+/*! \name Prescalers
+@{*/
 #define	PRESCALER_1			1
 #define	PRESCALER_2			2
 #define	PRESCALER_4			4
@@ -35,37 +48,69 @@
 #define	PRESCALER_64		64
 #define	PRESCALER_128		128
 #define	PRESCALER_INVALID	255
+/*!@} */
  
+/*! \name Prescalers - Counter Tick frequencies
+@{*/
 #define	PRESCALER_1_TICK	12000000
 #define	PRESCALER_8_TICK	1500000
 #define	PRESCALER_32_TICK	375000
 #define	PRESCALER_128_TICK	93750
+/*!@} */
 
- 
- /* Sets bits in a with bits from b using mask m
-  * http://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge */
-#define SET_BITS(a, b, m)	(a ^ ((a ^ b) & m))
+/*! \name Helper macros
+@{*/
+/*! Set bits helper macro.
+*
+* \param input The value to be changed.
+* \param val The new value.
+* \param mask The bit mask to use.
+*
+* This macro sets bits in input with bits from val using mask, 
+* see http://graphics.stanford.edu/~seander/bithacks.html#MaskedMerge. */
+#define SET_BITS(input, val, mask)	(input ^ ((input ^ val) & mask))
 
-/* Toggle bit n of a */
-#define TOGGLE_BIT(a, n)	(a ^ (1 << n))
+/*! Toggle bit helper macro.
+*
+* \param input The value to be changed.
+* \param mask The bit mask applied to input
+*
+* This macro toggles a bit in input using mask. */
+#define TOGGLE_BIT(input, mask)	(input ^ mask)
 
-/* Gets bits in a using mask m */
-#define GET_BITS(a, m)		(a & m)
+/*! Get bits helper macro.
+*
+* \param input The input value.
+* \param mask The bit mask to extract from input
+*
+* This macro extracts bits from input using mask. */
+#define GET_BITS(input, mask)	(input & mask)
+/*!@} */
 
-/* Interrupt flag values */
+/*! \name Interrupt flag
+@{*/
 #define	NO_INT_PENDING	0	/* No interrupt pending */
 #define	INT_PENDING		1	/* Interrupt pending */
+/*!@} */
 
+/*! \name Capture select
+@{*/
 /* Capture select */
-#define CAP_SEL_OFFSET	7		/* Bit offset of Timer x channel y capture select */
+#define CAP_SEL_OFFSET	7	/* Bit offset of Timer x channel y capture select */
 #define NORM_CAPTURE	0	/* Use normal capture input */
 #define	RF_CAPTURE		1	/* Use RF event(s) enabled in the RFIM register to trigger a capture */
+/*!@} */
 
+/*! \name Interrupt mask
+@{*/
 /* Interrupt mask */
-#define INT_MASK_OFFSET	6		/* Bit offset of Timer x channel y interrupt mask */
+#define INT_MASK_OFFSET	6	/* Bit offset of Timer x channel y interrupt mask */
 #define	INT_DISABLED	0	/* Interrupt disabled */
 #define	INT_ENABLED		1	/* Interrupt enabled */
+/*!@} */
 
+/*! \name Compare output mode
+@{*/
 /* Compare output mode */
 #define	COMP_OUT_OFFSET	5		/* Bit offset of Timer x channel y compare output mode */
 #define	SET_ON_COMP		0x00	/* Set output on compare */
@@ -85,16 +130,22 @@
 								   For Timer 1 channel 1 - DSM mode enable
 								   All others - Not used
 								   (use as mask) */
+/*!@} */
 
+/*! \name Mode. Select capture or compare mode
+@{*/
 /* Mode. Select capture or compare mode */
-#define	MODE_SELECT_OFFSET	2	/* Bit offset of Timer x channel y mode select */
-/* CMP != 111 - Select Timer 1 channel 1 capture or compare mode
-   CMP = 111 - Set the DSM speed */
+#define	MODE_SELECT_OFFSET	2	/* Bit offset of Timer x channel y mode select
+ CMP != 111 - Select Timer 1 channel 1 capture or compare mode
+ CMP = 111 - Set the DSM speed */
 #define	CAPTURE_MODE		0	/* For Timer channel 1 & CMP = 111 - 1/8 of timer tick speed
 								   All others - Capture mode*/
 #define	COMPARE_MODE		1	/* For Timer channel 1 & CMP = 111 - 1/4 of timer tick speed
 								   All others - Compare mode */
+/*!@} */
 
+/*! \name Capture mode select
+@{*/
 /* Capture mode select */
 /* CMP != 111 - Timer 1 Channel 1 capture mode select (timer mode)
    CMP = 111 - DSM interpolator and output shaping configuration (DSM mode) */
@@ -106,88 +157,100 @@
 								All others - Capture on falling edge */
 #define	CAPTURE_BOTH	0x03 /* For Timer channel 1 & CMP = 111 - DSM interpolator and output shaping disabled
 								All others - Capture on both edges */
+/*!@} */
 
+/*! \name Timer x/USARTx I/O location
+@{*/
 /* Timer x/USARTx I/O location */
-
 #define	IO_LOC_ALT_1	0	/* Alternative 1 location */
 #define	IO_LOC_ALT_2	1	/* Alternative 2 location */
 #define	IO_LOC_INVALID	255 /* Invalid location */
+/*!@} */
 
+/*! \name Port x function select
+@{*/
 /* Port x function select */
 #define GPIO		0 /* General purpose I/O */
 #define PERIPHERAL	1 /* Peripheral function */
+/*!@} */
 
-/****************************************************************************
- ****************************************************************************/
 
-/******************************
- * Timer 1 Registers - 16-bit *
- ******************************/
 
-/*********************************************
- * Timer 1 Counter (T1CNTH/T1CNTL), page 117 *
- *********************************************/
 
- /* Reset Timer 1 Counter by writing to low byte */
-#define T1_CNT_RESET()	{T1CNTL = 0x00;}
 
-/****************************************************************************/
 
-/************************************************
- * Timer 1 Control and Status (T1CTL), page 117 *
- ************************************************/
+/* ***************************************************************************
+  ****************************************************************************/
+
+/* *****************************
+  * Timer 1 Registers - 16-bit *
+  ******************************/
+/*! \name Timer 1 Counter (T1CNT)
+@{*/
+/* ********************************************
+  * Timer 1 Counter (T1CNTH/T1CNTL), page 117 *
+  *********************************************/
+#define RESET_T1CNT()	{ T1CNTL = 0x00; }
+/*!@} */
+
+/* ***************************************************************************/
+
+/* ***********************************************
+  * Timer 1 Control and Status (T1CTL), page 117 *
+  ************************************************/
+/* Bit offsets for fields */
+#define T1CTL_CH2IF_OFFSET	7
+#define T1CTL_CH1IF_OFFSET	6
+#define T1CTL_CH0IF_OFFSET	5
+#define T1CTL_OVFIF_OFFSET	4
+#define T1CTL_DIV_OFFSET	2
+#define T1CTL_MODE_OFFSET	0
+
+/* Bit masks for fields */
+#define T1CTL_CH2IF_MASK	128
+#define T1CTL_CH1IF_MASK	64
+#define T1CTL_CH0IF_MASK	32
+#define T1CTL_OVFIF_MASK	16
+#define T1CTL_DIV_MASK		12
+#define T1CTL_MODE_MASK		3
 
 /*******************************************
  * Timer 1 Channel 2 Interrupt flag, CH2IF *
  *******************************************/
-/* Bit offset of Timer 1 Channel 2 Interrupt flag */
-#define T1_CH2_INT_FLAG_OFFSET	7
-/* Set Timer 1 Channel 2 interrupt flag */
-#define T1_CH2_INT_FLAG_SET(v)	{T1CTL = SET_BITS(T1CTL, v << T1_CH2_INT_FLAG_OFFSET, 1 << T1_CH2_INT_FLAG_OFFSET);}
-/* Toggle Timer 1 Channel 2 interrupt flag */
-#define T1_CH2_INT_FLAG_TOGGLE()	{T1CTL = TOGGLE_BIT(T1CTL, T1_CH2_INT_FLAG_OFFSET);}
+#define SET_T1CTL_CH2IF(v)		{ T1CTL = SET_BITS(T1CTL, v << T1CTL_CH2IF_OFFSET, T1CTL_CH2IF_MASK); }
+#define TOGGLE_T1CTL_CH2IF()	{ T1CTL = TOGGLE_BIT(T1CTL, T1CTL_CH2IF_OFFSET); }
+#define GET_T1CTL_CH2IF()		( GET_BITS(T1CTL, T1CTL_CH2IF_MASK) >> T1CTL_CH2IF_OFFSET )
 
 /*******************************************
  * Timer 1 Channel 1 Interrupt flag, CH1IF *
  *******************************************/
-/* Bit offset of Timer 1 Channel 1 Interrupt flag */
-#define T1_CH1_INT_FLAG_OFFSET	6
-/* Set Timer 1 Channel 1 interrupt flag */
-#define T1_CH1_INT_FLAG_SET(v)	{T1CTL = SET_BITS(T1CTL, v << T1_CH1_INT_FLAG_OFFSET, 1 << T1_CH1_INT_FLAG_OFFSET);}
-/* Toggle Timer 1 Channel 1 interrupt flag */
-#define T1_CH1_INT_FLAG_TOGGLE()	{T1CTL = TOGGLE_BIT(T1CTL, T1_CH1_INT_FLAG_OFFSET);}
+#define SET_T1CTL_CH1IF(v)		{ T1CTL = SET_BITS(T1CTL, v << T1CTL_CH1IF_OFFSET, T1CTL_CH1IF_MASK); }
+#define TOGGLE_T1CTL_CH1IF()	{ T1CTL = TOGGLE_BIT(T1CTL, T1CTL_CH1IF_OFFSET); }
+#define GET_T1CTL_CH1IF()		( GET_BITS(T1CTL, T1CTL_CH1IF_MASK) >> T1CTL_CH1IF_OFFSET )
 
 /*******************************************
  * Timer 1 Channel 0 Interrupt flag, CH0IF *
  *******************************************/
-/* Bit offset of Timer 1 Channel 0 Interrupt flag */
-#define T1_CH0_INT_FLAG_OFFSET	5
-/* Set Timer 1 Channel 0 interrupt flag */
-#define T1_CH0_INT_FLAG_SET(v)	{T1CTL = SET_BITS(T1CTL, v << T1_CH0_INT_FLAG_OFFSET, 1 << T1_CH0_INT_FLAG_OFFSET);}
-/* Toggle Timer 1 Channel 0 interrupt flag */
-#define T1_CH0_INT_FLAG_TOGGLE()	{T1CTL = TOGGLE_BIT(T1CTL, T1_CH0_INT_FLAG_OFFSET);}
+#define SET_T1CTL_CH0IF(v)		{ T1CTL = SET_BITS(T1CTL, v << T1CTL_CH0IF_OFFSET, T1CTL_CH0IF_MASK); }
+#define TOGGLE_T1CTL_CH0IF()	{ T1CTL = TOGGLE_BIT(T1CTL, T1CTL_CH0IF_OFFSET); }
+#define GET_T1CTL_CH0IF()		( GET_BITS(T1CTL, T1CTL_CH0IF_MASK) >> T1CTL_CH0IF_OFFSET )
 
 /**************************************************
  * Timer 1 Counter overflow Interrupt flag, OVFIF *
  **************************************************/
-/* Bit offset of Timer 1 Counter overflow Interrupt flag */
-#define T1_CNTOV_INT_FLAG_OFFSET	4
-/* Set Timer 1 Counter overflow interrupt flag */
-#define T1_CNTOV_INT_FLAG_SET(v)	{T1CTL = SET_BITS(T1CTL, v << T1_CNTOV_INT_FLAG_OFFSET, 1 << T1_CNTOV_INT_FLAG_OFFSET);}
-/* Toggle Timer 1 Counter overflow interrupt flag */
-#define T1_CNTOV_INT_FLAG_TOGGLE()	{T1CTL = TOGGLE_BIT(T1CTL, T1_CNTOV_INT_FLAG_OFFSET);}
+#define SET_T1CTL_OVFIF(v)		{ T1CTL = SET_BITS(T1CTL, v << T1CTL_OVFIF_OFFSET, T1CTL_OVFIF_MASK); }
+#define TOGGLE_T1CTL_OVFIF()	{ T1CTL = TOGGLE_BIT(T1CTL, T1CTL_OVFIF_OFFSET); }
+#define GET_T1CTL_OVFIF()		( GET_BITS(T1CTL, T1CTL_OVFIF_MASK) >> T1CTL_OVFIF_OFFSET )
 
 /****************************************
  * Timer 1 Prescaler divider, DIV *
  ****************************************/
 #define	T1_PRESCALER_1		0x00	/* Tick frequency/1 */
 #define	T1_PRESCALER_8		0x04	/* Tick frequency/8 */
-#define	T1_PRESCALER_32		0x08	/* Tick frequency/32*/
-#define	T1_PRESCALER_128	0x0c	/* Tick frequency/128 (use as mask) */
-/* Set Timer 1 Prescaler divider */
-#define T1_PRESCALER_SET(v)		{T1CTL = SET_BITS(T1CTL, v, T1_PRESCALER_128); }
-/* Get Timer 1 Prescaler divider */
-#define T1_PRESCALER_GET()		(GET_BITS(T1CTL, T1_PRESCALER_128))
+#define	T1_PRESCALER_32		0x08	/* Tick frequency/32 */
+#define	T1_PRESCALER_128	0x0c	/* Tick frequency/128 */
+#define SET_T1CTL_DIV(v)	{ T1CTL = SET_BITS(T1CTL, v, T1CTL_DIV_MASK); }
+#define GET_T1CTL_DIV()		( GET_BITS(T1CTL, T1CTL_DIV_MASK) )
 
 /**********************
  * Timer 1 Mode, MODE *
@@ -197,10 +260,8 @@
 #define	T1_MODE_MODULO		0x02	/* Modulo, repeatedly count from 0x0000 to T1CC0 */
 #define	T1_MODE_UPDOWN		0x03	/* Up/down, repeatedly count from 0x0000 to T1CC0 and from T1CC0 down to 0x0000 */
 #define T1_MODE_INVALID		0xff
-/* Set Timer 1 Mode */
-#define T1_MODE_SET(v)		{T1CTL = SET_BITS(T1CTL, v, T1_MODE_UPDOWN); }
-/* Get Timer 1 Mode */
-#define T1_MODE_GET()		(GET_BITS(T1CTL, T1_MODE_UPDOWN))
+#define SET_T1CTL_MODE(v)	{ T1CTL = SET_BITS(T1CTL, v, T1CTL_MODE_MASK); }
+#define GET_T1CTL_MODE()	( GET_BITS(T1CTL, T1CTL_MODE_MASK) )
 
 /****************************************************************************/
 

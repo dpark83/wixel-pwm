@@ -2,7 +2,7 @@
 #include <usb.h>
 #include <usb_com.h>
 #include <stdio.h>
-#include <timer.h>
+#include <timer1.h>
 
 int32 CODE param_led_change_ms = 500;
 int32 CODE param_led_increment = 32;
@@ -42,12 +42,8 @@ void updateLeds()
 
 void main()
 {
-	uint8 t; /* timer */
-	uint8 c; /* channel */
 	uint32 f; /* frequency in hz */
 	
-	t = TIMER1;
-	c = CHANNEL1;
 	f = 200;
 
     systemInit();
@@ -58,13 +54,16 @@ void main()
 	T1CC1H = 0x00;
 
 	/* setup Timer 1, alt location 2 and prescaler 128*/
-	timerInit(t, IO_LOC_ALT_2, PRESCALER_128);
-	/* setup Channel 1 of Timer 1, compare mode, clear on compare up and peripheral*/
-	channelInit(t, c, COMPARE_MODE, CLR_ON_COMP_UP, PERIPHERAL);
-	/* start Timer 1 by setting it's mode to up/down */
-	timerMode(t, T1_MODE_MODULO);
+	t1Init(IO_LOC_ALT_2, PRESCALER_128);
+
+	/* setup Channel 1, compare mode, clear on compare up and peripheral*/
+	t1ChannelInit(CHANNEL1, COMPARE_MODE, CLR_ON_COMP_UP, PERIPHERAL);
+
+	/* start Timer 1 by setting it's mode to modulo */
+	t1Mode(T1_MODE_MODULO);
+
 	/* set Timer 1 frequency */
-	setFrequency(TIMER1, f);
+	setT1Frequency(f);
 
     while(1)
     {
