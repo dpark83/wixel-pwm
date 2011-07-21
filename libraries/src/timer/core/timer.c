@@ -1,5 +1,6 @@
 #include <cc2511_types.h>
 #include <stdio.h>
+#include <timer_defs.h>
 
 /******************
  * Global defines *
@@ -7,11 +8,6 @@
 
 #define TIMER_FALSE	1;
 #define TIMER_TRUE	0;
-
-/* Every timer has Channel 0 & 1 */
-#define	CHANNEL0		0
-#define	CHANNEL1		1
-#define CHANNEL_INVALID	255
 
 /* Helper macros */
 #define SET_BITS(input, val, mask)	(input ^ ((input ^ val) & mask))
@@ -23,50 +19,13 @@
 #define	INT_PENDING		1	/* Interrupt pending */
 
 /* Capture select */
-#define CAP_SEL_OFFSET	7	/* Bit offset of Timer x channel y capture select */
 #define NORM_CAPTURE	0	/* Use normal capture input */
 #define	RF_CAPTURE		1	/* Use RF event(s) enabled in the RFIM register to trigger a capture */
 
 /* Interrupt mask */
-#define INT_MASK_OFFSET	6	/* Bit offset of Timer x channel y interrupt mask */
 #define	INT_DISABLED	0	/* Interrupt disabled */
 #define	INT_ENABLED		1	/* Interrupt enabled */
 
-/* Compare output mode */
-#define	COMP_OUT_OFFSET	5		/* Bit offset of Timer x channel y compare output mode */
-#define	SET_ON_COMP		0x00	/* Set output on compare */
-#define	CLR_ON_COMP		0x08	/* Clear output on compare */
-#define	TOGGLE_ON_COMP	0x10	/* Toggle output on compare */
-#define	SET_ON_COMP_UP	0x18	/* Set output on compare-up, clear on 0 (clear on compare-down in up/down mode) */
-#define	CLR_ON_COMP_UP	0x20	/* Clear output on compare-up, set on 0 (set on compare-down in up/down mode) */
-#define	SET_CLR			0x28	/* For Timer 1 channel 0 - Reserved
-								   For Timer 1 channel 1/2 - Set when equal to TxCCy, clear when equal to TxCC0
-								   For Timer 3/4 channel 0 - Set output on compare, clear on 0xFF
-								   For Timer 3/4 channel 1 - Set output on compare, clear on TxCC0 */
-#define	CLR_SET			0x30	/* For Timer 1 channel 0 - Reserved
-								   For Timer 1 channel 1/2 - Clear when equal to TxCCy, set when equal to TxCC0
-								   For Timer 3/4 channel 0 - Clear output on compare, set on 0x00
-								   For Timer 3/4 channel 1 - Clear output on compare, set on TxCC0 */
-#define	DSM_MODE_ENABLE	0x38	/* For Timer 1 channel 0 - Reserved
-								   For Timer 1 channel 1 - DSM mode enable
-								   All others - Not used
-								   (use as mask) */
-/*!@} */
-
-/*! \name Mode. Select capture or compare mode
-@{*/
-/* Mode. Select capture or compare mode */
-#define	MODE_SELECT_OFFSET	2	/* Bit offset of Timer x channel y mode select
- CMP != 111 - Select Timer 1 channel 1 capture or compare mode
- CMP = 111 - Set the DSM speed */
-#define	CAPTURE_MODE		0	/* For Timer channel 1 & CMP = 111 - 1/8 of timer tick speed
-								   All others - Capture mode*/
-#define	COMPARE_MODE		1	/* For Timer channel 1 & CMP = 111 - 1/4 of timer tick speed
-								   All others - Compare mode */
-/*!@} */
-
-/*! \name Capture mode select
-@{*/
 /* Capture mode select */
 /* CMP != 111 - Timer 1 Channel 1 capture mode select (timer mode)
    CMP = 111 - DSM interpolator and output shaping configuration (DSM mode) */
@@ -78,24 +37,6 @@
 								All others - Capture on falling edge */
 #define	CAPTURE_BOTH	0x03 /* For Timer channel 1 & CMP = 111 - DSM interpolator and output shaping disabled
 								All others - Capture on both edges */
-/*!@} */
-
-/*! \name Timer x/USARTx I/O location
-@{*/
-/* Timer x/USARTx I/O location */
-#define	IO_LOC_ALT_1	0	/* Alternative 1 location */
-#define	IO_LOC_ALT_2	1	/* Alternative 2 location */
-#define	IO_LOC_INVALID	255 /* Invalid location */
-/*!@} */
-
-/*! \name Port x function select
-@{*/
-/* Port x function select */
-#define GPIO		0 /* General purpose I/O */
-#define PERIPHERAL	1 /* Peripheral function */
-/*!@} */
-
-
 
 /* TIMER SPECIFIC DEFINES */
 #if defined(TIMER1)
@@ -104,9 +45,6 @@
  **********************************/
 
  #include <timer1.h>
-
-/* only Timer 1 has a channel 2 */
-#define	CHANNEL2		2
 
 /* Prescalers */
 #define	PRESCALER_1			1
@@ -174,9 +112,8 @@
 /* Timer Mode - MODE[1:0] */
 #define	T1_MODE_OFF			0x00	/* Operation is suspended */
 #define	T1_MODE_FREE		0x01	/* Free-running, repeatedly count from 0x0000 to 0xFFFF */
-#define	T1_MODE_MODULO		0x02	/* Modulo, repeatedly count from 0x0000 to T1CC0 */
-#define	T1_MODE_UPDOWN		0x03	/* Up/down, repeatedly count from 0x0000 to T1CC0 and from T1CC0 down to 0x0000 */
-#define T1_MODE_INVALID		0xff
+/* #define	T1_MODE_MODULO		0x02	*/	/* Modulo, repeatedly count from 0x0000 to T1CC0 */
+/* #define	T1_MODE_UPDOWN		0x03	*/	/* Up/down, repeatedly count from 0x0000 to T1CC0 and from T1CC0 down to 0x0000 */
 #define TIMER_MODE_REGISTER	T1CTL
 #define TIMER_MODE_OFFSET	0
 #define TIMER_MODE_MASK		3
@@ -305,7 +242,7 @@
 #define	CHANNEL2_CAPCOMP_VALUE_LOW	T1CC2L
 
 /*****************
- *      TIMIF     *
+ *     TIMIF     *
  *****************/
  
 /* Timer overflow interrupt mask - OVFIM */
@@ -313,12 +250,35 @@
 #define TIMER_OVFL_INT_MASK_OFFSET		6
 #define TIMER_OVFL_INT_MASK_MASK		64
 
+/*****************
+ *    FUNCTIONS  *
+ *****************/
+#define getTNPreScaler				getT1PreScaler
+#define setTNPreScaler				setT1PreScaler
+#define setTNIoLocation				setT1IoLocation
+#define getTNIoLocation				getT1IoLocation
+#define setTNChannelMode			setT1ChannelMode
+#define setTNChannelCompareMode		setT1ChannelCompareMode
+#define setTNChannelFunction		setT1ChannelFunction
+#define tNChannelInit				t1ChannelInit
+#define tNMode						t1Mode
+#define getTNMode					getT1Mode
+#define setTNFrequency				setT1Frequency
+#define calculateTNCompareValue		calculateT1CompareValue
+#define checkTNChannel				checkT1Channel
+#define checkTNChannelCompareMode	checkT1ChannelCompareMode
+#define tNInit						t1Init
 
 #elif defined(TIMER3)
 /**********************************
  *             TIMER 3            *
  **********************************/
 #include <timer3.h>
+
+#define	T23_MODE_FREE		0x00
+#define	T23_MODE_DOWN		0x01
+#define	T23_MODE_MODULO		0x02
+#define	T23_MODE_UPDOWN		0x03
 
 /*****************
  *     PERCFG    *
@@ -618,7 +578,8 @@
 
 
 /* PreScaler functions */
-uint8 getT1PreScaler() {
+uint8 getTNPreScaler() {
+#if defined(TIMER1)
 	switch (GET_TIMER_PRESCALER()) {
 		case T1_PRESCALER_1: 
 			return PRESCALER_1;
@@ -634,24 +595,35 @@ uint8 getT1PreScaler() {
 			break;
 	}
 	return PRESCALER_INVALID;
+#else
+	return GET_TIMER_PRESCALER();
+#endif
 }
 
-BIT setT1PreScaler(uint8 preScaler) {
+BIT setTNPreScaler(uint8 preScaler) {
 	switch (preScaler) {
 		case PRESCALER_1:
+#if defined(TIMER1)
 			SET_TIMER_PRESCALER(T1_PRESCALER_1);
+#endif
 			return 0;
 			break;
 		case PRESCALER_8:
+#if defined(TIMER1)
 			SET_TIMER_PRESCALER(T1_PRESCALER_8);
+#endif
 			return 0;
 			break;
 		case PRESCALER_32:
+#if defined(TIMER1)
 			SET_TIMER_PRESCALER(T1_PRESCALER_32);
+#endif
 			return 0;
 			break;
 		case PRESCALER_128:
+#if defined(TIMER1)
 			SET_TIMER_PRESCALER(T1_PRESCALER_128);
+#endif
 			return 0;
 			break;
 	}
@@ -659,33 +631,17 @@ BIT setT1PreScaler(uint8 preScaler) {
 }
 
 /* IO Location functions*/
-BIT setT1IoLocation(uint8 ioLocation) {
-	switch (ioLocation) {
-		case IO_LOC_ALT_1:
-		case IO_LOC_ALT_2:
-			 SET_TIMER_IO_LOC(ioLocation);
-			break;
-		default:
-			return 1;
-			break;
-	}
+BIT setTNIoLocation(uint8 ioLocation) {
+	SET_TIMER_IO_LOC(ioLocation);
 	return 0;
 }
 
-uint8 getT1IoLocation() {
-	uint8 ioLoc;
-	ioLoc = GET_TIMER_IO_LOC();
-	switch (ioLoc) {
-		case IO_LOC_ALT_1:
-		case IO_LOC_ALT_2: 
-			return ioLoc;
-			break;
-	}
-	return IO_LOC_INVALID;
+uint8 getTNIoLocation() {
+	return GET_TIMER_IO_LOC();
 }
 
 /* functions to setup channel */
-BIT setT1ChannelMode(uint8 channelNum, uint8 mode) {
+BIT setTNChannelMode(uint8 channelNum, uint8 mode) {
 	switch (channelNum) {
 		case CHANNEL0: 
 			SET_CHANNEL0_CAP_COMP_MODE(mode);
@@ -693,9 +649,11 @@ BIT setT1ChannelMode(uint8 channelNum, uint8 mode) {
 		case CHANNEL1: 
 			SET_CHANNEL1_CAP_COMP_MODE(mode);
 			break;
+#if defined(TIMER1)
 		case CHANNEL2: 
 			SET_CHANNEL2_CAP_COMP_MODE(mode);
 			break;
+#endif
 		default: 
 			return 1;
 			break;
@@ -703,7 +661,7 @@ BIT setT1ChannelMode(uint8 channelNum, uint8 mode) {
 	return 0;
 }
 
-BIT setT1ChannelCompareMode(uint8 channelNum, uint8 compMode) {
+BIT setTNChannelCompareMode(uint8 channelNum, uint8 compMode) {
 	switch (channelNum) {
 		case CHANNEL0: 
 			SET_CHANNEL0_COMP_MODE(compMode);
@@ -711,9 +669,11 @@ BIT setT1ChannelCompareMode(uint8 channelNum, uint8 compMode) {
 		case CHANNEL1: 
 			SET_CHANNEL1_COMP_MODE(compMode);
 			break;
+#if defined(TIMER1)
 		case CHANNEL2: 
 			SET_CHANNEL2_COMP_MODE(compMode);
 			break;
+#endif
 		default: 
 			return 1;
 			break;
@@ -721,10 +681,10 @@ BIT setT1ChannelCompareMode(uint8 channelNum, uint8 compMode) {
 	return 0;
 }
 
-BIT setT1ChannelFunction(uint8 channelNum, uint8 function) {
+BIT setTNChannelFunction(uint8 channelNum, uint8 function) {
 	uint8 ioLoc;
 	uint8 pin;
-	ioLoc = getT1IoLocation();
+	ioLoc = getTNIoLocation();
 	
 	switch (ioLoc) {
 		case IO_LOC_ALT_1: 
@@ -742,22 +702,18 @@ BIT setT1ChannelFunction(uint8 channelNum, uint8 function) {
 	return 0;
 }
 
-BIT t1ChannelInit(uint8 channelNum, uint8 mode, uint8 compMode, uint8 function) {
-	if (checkT1Channel(channelNum) == 0) {
-		if (checkChannelMode(mode) == 0) {
-			if (setT1ChannelMode(channelNum, mode) == 1) {
+BIT tNChannelInit(uint8 channelNum, uint8 mode, uint8 compMode, uint8 function) {
+	if (checkTNChannel(channelNum) == 0) {
+		if (setTNChannelMode(channelNum, mode) == 1) {
+			return 1;
+		}
+		if (checkTNChannelCompareMode(channelNum, compMode) == 0) {
+			if (setTNChannelCompareMode(channelNum, compMode) == 1) {
 				return 1;
 			}
 		}
-		if (checkT1ChannelCompareMode(channelNum, compMode) == 0) {
-			if (setT1ChannelCompareMode(channelNum, compMode) == 1) {
-				return 1;
-			}
-		}
-		if (checkChannelFunction(function) == 0) {
-			if (setT1ChannelFunction(channelNum, function) == 1) {
-				return 1;
-			}
+		if (setTNChannelFunction(channelNum, function) == 1) {
+			return 1;
 		}
 		return 0;
 	}
@@ -765,35 +721,51 @@ BIT t1ChannelInit(uint8 channelNum, uint8 mode, uint8 compMode, uint8 function) 
 }
 
 /* functions to start/stop a timer */
-BIT t1Mode(uint8 mode) {
-	if (checkT1Mode(mode) == 0) {
-		SET_TIMER_MODE(mode);
-		return 0;
-	}
-	return 1;
-}
-
-uint8 getT1Mode() {
+BIT tNMode(uint8 mode) {
 	uint8 tMode;
-	tMode = GET_TIMER_MODE();
-	switch (tMode) {
-		case T1_MODE_OFF:
-		case T1_MODE_FREE:
-		case T1_MODE_MODULO:
-		case T1_MODE_UPDOWN:
-			return tMode;
+	switch (mode) {
+#if defined(TIMER1)
+		case MODE_OFF:
+			tMode = T1_MODE_OFF;
+			break;
+#endif
+		case MODE_FREE:
+#if defined(TIMER1)
+			tMode = T1_MODE_FREE;
+#else
+			tMode = T23_MODE_FREE;
+#endif
+			break;
+		case MODE_MODULO:
+			tMode = MODE_MODULO;
+			break;
+		case MODE_UPDOWN:
+			tMode = MODE_UPDOWN;
+			break;
+#if defined(TIMER3) || defined(TIMER4)
+		case MODE_DOWN:
+			tMode = T23_MODE_DOWN;
+			break;
+#endif
+		default:
+			return 1;
 			break;
 	}
-	return T1_MODE_INVALID;
+	SET_TIMER_MODE(tMode);
+	return 0;
+}
+
+uint8 getTNMode() {
+	return GET_TIMER_MODE();
 }
 
 /* functions to set frequency of a timer */
-BIT setT1Frequency(uint32 frequency) {
+BIT setTNFrequency(uint32 frequency) {
 	uint16 val;
 	if (frequency == 0) {
 		return 1;
 	}
-	val = calculateT1CompareValue(frequency);
+	val = calculateTNCompareValue(frequency);
 	if (val == 0 || val == 0xffff) {
 		return 1;
 	}
@@ -801,10 +773,11 @@ BIT setT1Frequency(uint32 frequency) {
 	return 0;
 }
 
-uint16 calculateT1CompareValue(uint32 frequency) {
-	switch (getT1Mode()) {
-		case T1_MODE_MODULO:
-			switch (getT1PreScaler()) {
+uint16 calculateTNCompareValue(uint32 frequency) {
+	switch (getTNMode()) {
+#if defined(TIMER1)
+		case MODE_MODULO:
+			switch (getTNPreScaler()) {
 				case PRESCALER_1:
 					return calculateModuloValue(PRESCALER_1_TICK, frequency);
 					break;
@@ -819,6 +792,7 @@ uint16 calculateT1CompareValue(uint32 frequency) {
 					break;
 			}
 			break;
+#endif
 	}
 	return 0;
 }
@@ -833,40 +807,20 @@ uint16 calculateModuloValue(uint32 preScalerTick, uint32 frequency) {
 }
 
 /* general checker functions */
-BIT checkT1Mode(uint8 mode) {
-	switch (mode) {
-		case T1_MODE_OFF:
-		case T1_MODE_FREE:
-		case T1_MODE_MODULO:
-		case T1_MODE_UPDOWN:
-			return 0;
-			break;
-	}
-	return 1;
-}
-
-BIT checkT1Channel(uint8 channelNum) {
+BIT checkTNChannel(uint8 channelNum) {
 	switch (channelNum) {
 		case CHANNEL0:
 		case CHANNEL1:
+#if defined(TIMER1)
 		case CHANNEL2:
+#endif
 			return 0;
 			break;
 	}
 	return 1;
 }
 
-BIT checkChannelMode(uint8 mode) {
-	switch (mode) {
-		case CAPTURE_MODE:
-		case COMPARE_MODE:
-			return 0;
-			break;
-	}
-	return 1;
-}
-
-BIT checkT1ChannelCompareMode(uint8 channelNum, uint8 compMode) {
+BIT checkTNChannelCompareMode(uint8 channelNum, uint8 compMode) {
 	switch (channelNum) {
 		case CHANNEL0:
 			switch (compMode) {
@@ -875,11 +829,17 @@ BIT checkT1ChannelCompareMode(uint8 channelNum, uint8 compMode) {
 				case TOGGLE_ON_COMP: 
 				case SET_ON_COMP_UP: 
 				case CLR_ON_COMP_UP: 
+#if defined(TIMER3) || defined(TIMER4)
+				case SET_CLR: 
+				case CLR_SET: 
+				case DSM_MODE_ENABLE: 
+#endif
 					return 0;
 					break;
 			}
 			break;
 		case CHANNEL1:
+#if defined(TIMER1)
 		case CHANNEL2:
 			switch (compMode) {
 				case SET_ON_COMP: 
@@ -893,28 +853,20 @@ BIT checkT1ChannelCompareMode(uint8 channelNum, uint8 compMode) {
 					return 0;
 					break;
 			}
-	}
-	return 1;
-}
-
-BIT checkChannelFunction(uint8 function) {
-	switch (function) {
-		case GPIO: 
-		case PERIPHERAL: 
-			return 0;
-			break;
+#endif
 	}
 	return 1;
 }
 
 /* function to initalise a timer */
-BIT t1Init(uint8 ioLocation, uint8 preScaler) {
-	if (setT1IoLocation(ioLocation) == 1) {
+BIT tNInit(uint8 ioLocation, uint8 preScaler) {
+	if (setTNIoLocation(ioLocation) == 1) {
 		return 1;
 	}
 	/* set perScaler if invalud return false */
-	if (setT1PreScaler(preScaler) == 1) {
+	if (setTNPreScaler(preScaler) == 1) {
 		return 1;
 	}
 	return 0;
 }
+	

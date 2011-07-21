@@ -60,7 +60,7 @@ void main()
 	t1ChannelInit(CHANNEL1, COMPARE_MODE, CLR_ON_COMP_UP, PERIPHERAL);
 
 	/* start Timer 1 by setting it's mode to modulo */
-	t1Mode(T1_MODE_MODULO);
+	t1Mode(MODE_MODULO);
 
 	/* set Timer 1 frequency */
 	setT1Frequency(f);
