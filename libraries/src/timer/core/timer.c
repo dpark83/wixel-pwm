@@ -44,22 +44,7 @@
  *             TIMER 1            *
  **********************************/
 
- #include <timer1.h>
-
-/* Prescalers */
-#define	PRESCALER_1			1
-#define	PRESCALER_8			8
-#define	PRESCALER_32		32
-#define	PRESCALER_128		128
-#define	PRESCALER_INVALID	255
-
-/* Prescaler Tick */
-/* need to check if this a valid for all timers or not, if they are then they
-   can be used for all timers. */
-#define	PRESCALER_1_TICK	12000000
-#define	PRESCALER_8_TICK	1500000
-#define	PRESCALER_32_TICK	375000
-#define	PRESCALER_128_TICK	93750
+#include <timer1.h>
 
 /*****************
  *     PERCFG    *
