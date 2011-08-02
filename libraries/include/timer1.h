@@ -27,7 +27,7 @@ uint8 getT1Mode();
 /* functions to set frequency of a timer */
 BIT setT1Frequency(uint32 frequency);
 uint16 calculateT1CompareValue(uint32 frequency);
-uint16 calculateModuloValue(uint32 preScalerTick, uint32 frequency);
+uint16 calculateT1ModuloValue(uint32 preScalerTick, uint32 frequency);
 
 /* general checker functions */
 BIT checkT1Channel(uint8 channelNum);

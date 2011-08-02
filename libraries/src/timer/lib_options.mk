@@ -1,5 +1,5 @@
 # This library will be made by linking timer1.rel, timer3.rel and timer4.rel.
-LIB_RELS := libraries/src/timer/timer1.rel # libraries/src/timer/timer3.rel  libraries/src/timer/timer4.rel
+LIB_RELS := libraries/src/timer/timer1.rel # libraries/src/timer/timer3.rel libraries/src/timer/timer4.rel
 
 # When those rel (object) files are compiled, there will be a
 # special preprocessor flag to specify which UART to use.
