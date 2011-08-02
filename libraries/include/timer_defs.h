@@ -38,14 +38,14 @@
 | 128 |	  YES   |    YES    |
 +-----+---------+-----------+
 */
-#define	PRESCALER_1			1
-#define	PRESCALER_2			2
-#define	PRESCALER_4			4
-#define	PRESCALER_8			8
-#define	PRESCALER_16		16
-#define	PRESCALER_32		32
-#define	PRESCALER_64		64
-#define	PRESCALER_128		128
+#define	PRESCALER_1			0
+#define	PRESCALER_2			1
+#define	PRESCALER_4			2
+#define	PRESCALER_8			3
+#define	PRESCALER_16		4
+#define	PRESCALER_32		5
+#define	PRESCALER_64		6
+#define	PRESCALER_128		7
 #define	PRESCALER_INVALID	255
 
 /* Prescalers Tick frequencies
@@ -122,5 +122,8 @@ These are used in calculating the values for frequencies
 #define	MODE_MODULO	0x02
 #define MODE_UPDOWN	0x03
 #define	MODE_DOWN	0x04
+
+#define	TIMER_SUSPENDED			0
+#define	TIMER_NORMAL_OPERATION	1
 
 #endif

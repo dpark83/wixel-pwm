@@ -248,6 +248,8 @@
 #define tNChannelInit				t1ChannelInit
 #define tNMode						t1Mode
 #define getTNMode					getT1Mode
+#define	tNStart						t1Start
+#define	tNStop						t1Stop
 #define setTNFrequency				setT1Frequency
 #define calculateTNCompareValue		calculateT1CompareValue
 #define calculateTNModuloValue		calculateT1ModuloValue
@@ -261,10 +263,10 @@
  **********************************/
 #include <timer3.h>
 
-#define	T23_MODE_FREE		0x00
-#define	T23_MODE_DOWN		0x01
-#define	T23_MODE_MODULO		0x02
-#define	T23_MODE_UPDOWN		0x03
+#define	T34_MODE_FREE		0x00
+#define	T34_MODE_DOWN		0x01
+#define	T34_MODE_MODULO		0x02
+#define	T34_MODE_UPDOWN		0x03
 
 /*****************
  *     PERCFG    *
@@ -402,6 +404,8 @@
 #define tNChannelInit				t3ChannelInit
 #define tNMode						t3Mode
 #define getTNMode					getT3Mode
+#define	tNStart						t3Start
+#define	tNStop						t3Stop
 #define setTNFrequency				setT3Frequency
 #define calculateTNCompareValue		calculateT3CompareValue
 #define calculateTNModuloValue		calculateT3ModuloValue
@@ -457,9 +461,9 @@
 #define TIMER_CLEAR_MASK		4
 
 /* Timer Mode - MODE[1:0] */
-#define TIMER_PRESCALER_REGISTER	T4CTL
-#define TIMER_PRESCALER_OFFSET		0
-#define TIMER_PRESCALER_MASK		3
+#define TIMER_MODE_REGISTER	T4CTL
+#define TIMER_MODE_OFFSET	0
+#define TIMER_MODE_MASK		3
 
 /**********************************
  *            CHANNEL 0           *
@@ -560,8 +564,13 @@
  *     MACROS    *
  *****************/
 
+#if defined(TIMER1)
 #define SET_TIMER_PRESCALER(v)	{ TIMER_PRESCALER_REGISTER = SET_BITS(TIMER_PRESCALER_REGISTER, v, TIMER_PRESCALER_MASK); }
 #define GET_TIMER_PRESCALER()	( GET_BITS(TIMER_PRESCALER_REGISTER, TIMER_PRESCALER_MASK) )
+#else
+#define SET_TIMER_PRESCALER(v)	{ TIMER_PRESCALER_REGISTER = SET_BITS(TIMER_PRESCALER_REGISTER, v << TIMER_PRESCALER_OFFSET, TIMER_PRESCALER_MASK); }
+#define GET_TIMER_PRESCALER()	( GET_BITS(TIMER_PRESCALER_REGISTER, TIMER_PRESCALER_MASK) >> TIMER_PRESCALER_OFFSET )
+#endif
 
 #define SET_TIMER_IO_LOC(v)	{ TIMER_IO_LOC_REGISTER = SET_BITS(TIMER_IO_LOC_REGISTER, v << TIMER_IO_LOC_OFFSET, TIMER_IO_LOC_MASK); }
 #define GET_TIMER_IO_LOC()	( GET_BITS(TIMER_IO_LOC_REGISTER, TIMER_IO_LOC_MASK) >> TIMER_IO_LOC_OFFSET )
@@ -584,6 +593,12 @@
 #define SET_CHANNEL0_CAPCOMP_VALUE(v)	{CHANNEL0_CAPCOMP_VALUE_HIGH = (uint8)(v >> 8); CHANNEL0_CAPCOMP_VALUE_LOW = (uint8)v;}
 #else
 #define SET_CHANNEL0_CAPCOMP_VALUE(v)	{CHANNEL0_COMP_VALUE = v;}
+
+#define SET_TIMER_START(v)		{TIMER_START_REGISTER = SET_BITS(TIMER_START_REGISTER, v << TIMER_START_OFFSET, TIMER_START_MASK); }
+#endif
+
+#if defined(TIMER1)
+uint8 _t1Mode = T1_MODE_OFF;
 #endif
 
 /* PreScaler functions */
@@ -737,15 +752,15 @@ BIT tNMode(uint8 mode) {
 	uint8 tMode;
 	switch (mode) {
 #if defined(TIMER1)
-		case MODE_OFF:
-			tMode = T1_MODE_OFF;
-			break;
+//		case MODE_OFF:
+//			tMode = T1_MODE_OFF;
+//			break;
 #endif
 		case MODE_FREE:
 #if defined(TIMER1)
 			tMode = T1_MODE_FREE;
 #else
-			tMode = T23_MODE_FREE;
+			tMode = T34_MODE_FREE;
 #endif
 			break;
 		case MODE_MODULO:
@@ -756,19 +771,45 @@ BIT tNMode(uint8 mode) {
 			break;
 #if defined(TIMER3) || defined(TIMER4)
 		case MODE_DOWN:
-			tMode = T23_MODE_DOWN;
+			tMode = T34_MODE_DOWN;
 			break;
 #endif
 		default:
 			return 1;
 			break;
 	}
+#if defined(TIMER1)
+	_t1Mode = tMode;
+#else
 	SET_TIMER_MODE(tMode);
+#endif
 	return 0;
 }
 
 uint8 getTNMode() {
+#if defined(TIMER1)
+	return _t1Mode;
+#else
 	return GET_TIMER_MODE();
+#endif
+}
+
+BIT tNStart() {
+#if defined(TIMER1)
+	SET_TIMER_MODE(_t1Mode);
+#else
+	SET_TIMER_START(TIMER_NORMAL_OPERATION);
+#endif
+	return 0;
+}
+
+BIT tNStop() {
+#if defined(TIMER1)
+	SET_TIMER_MODE(T1_MODE_OFF);
+#else
+	SET_TIMER_START(TIMER_SUSPENDED);
+#endif
+	return 0;
 }
 
 /* functions to set frequency of a timer */

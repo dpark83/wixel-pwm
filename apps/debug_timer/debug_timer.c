@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <timer1.h>
 #include <timer3.h>
-#include <timer4.h>
 
 /* VARIABLES ******************************************************************/
 
@@ -31,7 +30,7 @@ void processByte(uint8 byteReceived)
 {
     switch(byteReceived)
     {
-    case 't':
+    case '1':
 	
 		responseLength = sprintf(response, "NOTE=Initial settings\r\n");
 		usbComTxSend(response, responseLength);
@@ -62,13 +61,83 @@ void processByte(uint8 byteReceived)
 		usbComTxSend(response, responseLength);
 		debugOutput();
 
+		setT1ChannelFunction(CHANNEL0, PERIPHERAL);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL0, PERIPHERAL)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelFunction(CHANNEL0, GPIO);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL0, GPIO)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelFunction(CHANNEL1, PERIPHERAL);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL1, PERIPHERAL)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelFunction(CHANNEL1, GPIO);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL1, GPIO)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelFunction(CHANNEL2, PERIPHERAL);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL2, PERIPHERAL)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelFunction(CHANNEL2, GPIO);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL2, GPIO)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
 		setT1IoLocation(IO_LOC_ALT_1);
 		responseLength = sprintf(response, "NOTE=setT1IoLocation(IO_LOC_ALT_1)\r\n");
 		usbComTxSend(response, responseLength);
 		debugOutput();
 
+		setT1ChannelFunction(CHANNEL0, PERIPHERAL);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL0, PERIPHERAL)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelFunction(CHANNEL0, GPIO);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL0, GPIO)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelFunction(CHANNEL1, PERIPHERAL);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL1, PERIPHERAL)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelFunction(CHANNEL1, GPIO);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL1, GPIO)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelFunction(CHANNEL2, PERIPHERAL);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL2, PERIPHERAL)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelFunction(CHANNEL2, GPIO);
+		responseLength = sprintf(response, "NOTE=setT1ChannelFunction(CHANNEL2, GPIO)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
 		t1Mode(MODE_FREE);
 		responseLength = sprintf(response, "NOTE=t1Mode(MODE_FREE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		t1Start();
+		responseLength = sprintf(response, "NOTE=t1Start()\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		t1Stop();
+		responseLength = sprintf(response, "NOTE=t1Stop()\r\n");
 		usbComTxSend(response, responseLength);
 		debugOutput();
 		
@@ -77,18 +146,207 @@ void processByte(uint8 byteReceived)
 		usbComTxSend(response, responseLength);
 		debugOutput();
 
+		t1Start();
+		responseLength = sprintf(response, "NOTE=t1Start()\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		t1Stop();
+		responseLength = sprintf(response, "NOTE=t1Stop()\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
 		t1Mode(MODE_UPDOWN);
 		responseLength = sprintf(response, "NOTE=t1Mode(MODE_UPDOWN)\r\n");
 		usbComTxSend(response, responseLength);
 		debugOutput();
-		
-		t1Mode(MODE_OFF);
-		responseLength = sprintf(response, "NOTE=t1Mode(MODE_OFF)\r\n");
+
+		t1Start();
+		responseLength = sprintf(response, "NOTE=t1Start()\r\n");
 		usbComTxSend(response, responseLength);
 		debugOutput();
 
+		t1Stop();
+		responseLength = sprintf(response, "NOTE=t1Stop()\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
 		
+		setT1ChannelMode(CHANNEL0, COMPARE_MODE);
+		responseLength = sprintf(response, "NOTE=setT1ChannelMode(CHANNEL0, COMPARE_MODE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelMode(CHANNEL0, CAPTURE_MODE);
+		responseLength = sprintf(response, "NOTE=setT1ChannelMode(CHANNEL0, CAPTURE_MODE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelMode(CHANNEL1, COMPARE_MODE);
+		responseLength = sprintf(response, "NOTE=setT1ChannelMode(CHANNEL1, COMPARE_MODE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelMode(CHANNEL1, CAPTURE_MODE);
+		responseLength = sprintf(response, "NOTE=setT1ChannelMode(CHANNEL1, CAPTURE_MODE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelMode(CHANNEL2, COMPARE_MODE);
+		responseLength = sprintf(response, "NOTE=setT1ChannelMode(CHANNEL2, COMPARE_MODE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelMode(CHANNEL2, CAPTURE_MODE);
+		responseLength = sprintf(response, "NOTE=setT1ChannelMode(CHANNEL2, CAPTURE_MODE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL0, CLR_ON_COMP_UP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL0, CLR_ON_COMP_UP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL0, SET_ON_COMP_UP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL0, SET_ON_COMP_UP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL0, TOGGLE_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL0, TOGGLE_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL0, CLR_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL0, CLR_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL0, SET_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL0, SET_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL1, DSM_MODE_ENABLE);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, DSM_MODE_ENABLE)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL1, CLR_SET);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, CLR_SET)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL1, SET_CLR);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, SET_CLR)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelCompareMode(CHANNEL1, CLR_ON_COMP_UP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, CLR_ON_COMP_UP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelCompareMode(CHANNEL1, SET_ON_COMP_UP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, SET_ON_COMP_UP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL1, TOGGLE_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, TOGGLE_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL1, CLR_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, CLR_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL1, SET_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL1, SET_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL2, CLR_SET);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL2, CLR_SET)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL2, SET_CLR);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL2, SET_CLR)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelCompareMode(CHANNEL2, CLR_ON_COMP_UP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL2, CLR_ON_COMP_UP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+		
+		setT1ChannelCompareMode(CHANNEL2, SET_ON_COMP_UP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL2, SET_ON_COMP_UP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL2, TOGGLE_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL2, TOGGLE_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL2, CLR_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL2, CLR_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT1ChannelCompareMode(CHANNEL2, SET_ON_COMP);
+		responseLength = sprintf(response, "NOTE=setT1ChannelCompareMode(CHANNEL2, SET_ON_COMP)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
         break;
+    case '3':
+	
+		responseLength = sprintf(response, "NOTE=Initial settings\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_128);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_128)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_64);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_64)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_32);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_32)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_16);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_16)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_8);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_8)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_4);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_4)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_2);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_2)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
+
+		setT3PreScaler(PRESCALER_1);
+		responseLength = sprintf(response, "NOTE=setT3PreScaler(PRESCALER_1)\r\n");
+		usbComTxSend(response, responseLength);
+		debugOutput();
     }
 }
 
