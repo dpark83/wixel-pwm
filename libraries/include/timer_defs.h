@@ -93,8 +93,12 @@ These are used in calculating the values for frequencies
 #define	DSM_MODE_ENABLE	0x38
 
 /* Channel mode */
+/* TIMER1 */
 #define	CAPTURE_MODE	0
 #define	COMPARE_MODE	1
+/* TIMR 3/4 */
+#define	DISABLE	0
+#define	ENABLE	1
 
 #define	IO_LOC_ALT_1	0
 #define	IO_LOC_ALT_2	1

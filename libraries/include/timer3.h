@@ -23,6 +23,8 @@ BIT t3ChannelInit(uint8 channelNum, uint8 mode, uint8 compMode, uint8 function);
 /* functions to start/stop a timer */
 BIT t3Mode(uint8 mode);
 uint8 getT3Mode();
+void t3Start();
+void t3Stop();
 
 /* functions to set frequency of a timer */
 BIT setT3Frequency(uint32 frequency);

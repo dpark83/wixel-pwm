@@ -713,12 +713,25 @@ BIT setTNChannelFunction(uint8 channelNum, uint8 function) {
 	
 	switch (ioLoc) {
 		case IO_LOC_ALT_1: 
+#if defined(TIMER1)
 			pin = channelNum + 2;
 			SET_P0_FUNC(pin, function);
+#elif defined(TIMER3)
+			pin = channelNum + 3;
+			SET_P1_FUNC(pin, function);
+#else
+			pin = channelNum;
+			SET_P1_FUNC(pin, function);
+#endif
 			break;
 		case IO_LOC_ALT_2: 
+#if defined(TIMER1)
 			pin = (channelNum ^ 3) - 1;
 			SET_P1_FUNC(pin, function);
+#else
+			pin = channelNum + 6;
+			SET_P1_FUNC(pin, function);
+#endif
 			break;
 		default:
 			return 1;
@@ -794,22 +807,20 @@ uint8 getTNMode() {
 #endif
 }
 
-BIT tNStart() {
+void tNStart() {
 #if defined(TIMER1)
 	SET_TIMER_MODE(_t1Mode);
 #else
 	SET_TIMER_START(TIMER_NORMAL_OPERATION);
 #endif
-	return 0;
 }
 
-BIT tNStop() {
+void tNStop() {
 #if defined(TIMER1)
 	SET_TIMER_MODE(T1_MODE_OFF);
 #else
 	SET_TIMER_START(TIMER_SUSPENDED);
 #endif
-	return 0;
 }
 
 /* functions to set frequency of a timer */
